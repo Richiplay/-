@@ -1,0 +1,26 @@
+import RPi.GPIO as GPIO
+import time
+
+# Настройка пинов
+PUMP_PIN = 18
+MOISTURE_SENSOR_PIN = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(PUMP_PIN, GPIO.OUT)
+GPIO.setup(MOISTURE_SENSOR_PIN, GPIO.IN)
+
+def read_moisture():
+    return GPIO.input(MOISTURE_SENSOR_PIN)
+
+def pump_water(duration):
+    GPIO.output(PUMP_PIN, GPIO.HIGH)
+    time.sleep(duration)
+    GPIO.output(PUMP_PIN, GPIO.LOW)
+
+try:
+    while True:
+        if read_moisture() == GPIO.LOW:  # если почва сухая
+            pump_water(10)  # включаем насос на 10 секунд
+        time.sleep(300)  # проверяем каждые 5 минут
+
+except KeyboardInterrupt:
+    GPIO.cleanup()
